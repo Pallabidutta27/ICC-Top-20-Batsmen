@@ -1,0 +1,538 @@
+---
+title: 'Comparing Performances Among Top 20 ICC T20 Batsmen'
+author: "Pallabi Dutta"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    theme: united
+---
+# ABSTRACT
+
+In cricket, a batsman's performance is often assessed by their average (arithmetic mean) runs scored over their career. However, the mean alone doesn't provide a complete picture. The next step is to calculate the standard deviation, which describes how 'spread out' a batsman's scores are. Better batsmen, with higher averages, tend to have larger standard deviations due to their higher scores. Consequently, 'most consistent' performers might appear to be those with lower average scores. This paper aims to test the significance of the consistency in the performances of the top **20 ICC T20** ranked batsmen as of 16 July 2024. To achieve this, secondary data was collected and analyzed.
+
+# INTRODUCTION
+
+Cricket is a bat-and-ball game played between two teams of eleven players on a cricket field, with a 22-yard-long rectangular pitch at the center, featuring a wicket (a set of three wooden stumps) at each end. One team bats, aiming to score as many runs as possible, while the opposing team fields. Each phase of play is called an innings. After ten batsmen have been dismissed or a set number of overs have been completed, the innings ends, and the teams swap roles. The team with the most runs at the end of their innings wins the game. The International Cricket Council (ICC), the governing body of cricket, oversees its rules and regulations.
+
+The ICC Player Rankings are a sophisticated moving average system, rating players on a scale from 0 to 1000 points. A player's points increase if their performance improves compared to their past record and decrease if their performance declines. The value of each performance within a match is calculated using an algorithm that considers various match circumstances.
+
+For a batsman, the rating factors include runs scored and the ratings of the opposing bowling attack—the higher the combined ratings of the attack, the more value is attributed to the batsman's innings. Additional factors include the level of run-scoring in the match and performance in victories, with a higher bonus for victories against highly rated teams. In T20 (Twenty20 cricket), batsmen gain significant credit for rapid scoring and only a small amount of credit for remaining not out.
+
+T20 cricket is a short form of cricket recognized by the ICC, initially introduced by the England and Wales Cricket Board (ECB) in 2003 for inter-county competitions. In a Twenty20 game, each team has a single innings limited to a maximum of 20 overs, with a break between the innings.
+
+# OBJECTIVES OF THE STUDY:
+
+This study aims to assess the batting consistency of the top 20 ranked T20 cricketers in July 2024. Using appropriate techniques, the players are compared based on their batting average and consistency.
+
+# MATERIALS USED IN THE STUDY:
+
+T20 run data for the top 20 ICC-ranked cricketers in July 2024 was obtained from websites [ICC Men's Ranking Batting](https://www.icc-cricket.com/rankings/batting/mens/t20i) and [Player Stats](https://www.howstat.com/Cricket/Statistics/Players/PlayerMenu.asp) (by adding the player name in Player Stats page).
+
+## DIFFERENT MEASURES USED IN THE PRESENT STUDY
+
+The measures used in the present study are as follows:
+
+**Mean (or Average):**
+The mean is the most popular and well-known measure of central tendency. It provides an overall indication of the typical value in a data set. For a data set with \( n \) values, represented as ( $x_1, x_2,\ldots,x_n$), the mean is calculated using the following formula:
+
+$Mean(\bar{x})=\frac1n\Sigma_{i=1}^{n}x_{i}$
+
+
+**Standard Deviation:**
+The standard deviation measures the amount of variation or dispersion in a data set. It indicates how spread out the values are from the mean. For the same data set, the standard deviation ($\sigma$) is calculated as follows:
+
+${\sigma=\sqrt{\frac1n\sum_{i=1}^n(x_{i}-\bar{x})^2}}$
+
+
+These measures provide a basis for analyzing the consistency and variability in the performances of the top 20 ICC T20 ranked batsmen.
+
+**The names, ranks and the points along with other data of top twenty Cricketer of T20 ICC ranking are shown in the following table:**
+
+```{r,echo=FALSE,comment=NA}
+data=read.csv("C:/Users/Pallabi dutta/OneDrive/Desktop/Self/cricket stats.csv")
+library(knitr)
+kable(data)
+```
+
+**The runs scored by the top players along with other information is displayed in the following table:**
+
+```{r,echo=FALSE,comment=NA,warning=FALSE}
+df=read.csv("C:/Users/Pallabi dutta/OneDrive/cricket runs.csv")
+library(rmarkdown)
+paged_table(df)
+```
+
+**' symbol represents Not Out in an inning.**
+
+**To prepare a modified table of a player's runs by adding the runs from not-out innings to the preceding or succeeding innings:**
+
+```{r,echo=FALSE,comment=NA,results='asis',warning=FALSE}
+data=read.csv("C:/Users/Pallabi dutta/OneDrive/cricket sd.csv")
+library(xtable)
+print(xtable(data), type = "html")
+org=NULL
+org=data
+```
+
+# Methodology:
+
+This study aimed to identify the most consistent batsman among the top 20 ICC T20-ranked cricketers. To achieve this, secondary data encompassing the complete T20 career scores of these players was collected from [ICC Men's Batting](https://www.icc-cricket.com/rankings/batting/mens/t20i) and [Player Stats](https://www.howstat.com/Cricket/Statistics/Players/PlayerMenu.asp).
+
+A modified dataset was constructed by excluding 'Not Out' records. To calculate average runs, 'Not Out' scores were incorporated into the preceding or succeeding innings.
+A batsman will be categorized as 'good' if their average runs exceeded 30. To evaluate the significance of batting performance differences, either ANOVA or Kruskal-Wallis test is employed. Descriptive statistics (mean, standard deviation) and graphical analysis are also conducted to support the findings.
+
+To choose **ANOVA** when:
+
+**Data is Normal**: The data within each group follows a normal distribution.
+
+**Equal Variances**: Groups have similar variances.
+
+**Continuous Data**: The outcomes are measured on a continuous scale.
+
+To choose **Kruskal-Wallis test** when:
+
+**Non-Normal Data**: The data isn’t normally distributed.
+
+**Unequal Variances**: Groups have different variances.
+
+**Ordinal Data**: The outcomes are ordinal or ranks are more suitable.
+
+ANOVA suits parametric data while Kruskal-Wallis is ideal for non-parametric data.
+
+**Basic Claim:**
+There is no significant difference in the performance of the batsmen based on the averages being compared. 
+
+## CALCULATION:
+
+### CALCULATION OF STANDARD DEVIATION:
+
+The standard deviation is displayed in the following table:
+
+```{r,echo=FALSE,comment=NA,warning=FALSE}
+attach(data)
+library(stringr)
+runs=str_split(Match.by.match.runs.scored...yij.,",")
+sd=NULL
+for(i in 1:20)
+{
+sd[i]=sqrt(sum((as.numeric(runs[[i]])-Average.Runs[i])^2)/Adjusted.Innings[i])
+}
+data1=data.frame(data[,-3],"Standard Deviation"=sd)
+kable(data1)
+```
+
+**The players are then ranked according to their consistency.**
+
+```{r,echo=FALSE,comment=NA,warning=FALSE}
+attach(data1)
+ordering=order(Standard.Deviation,Name)
+data1$rank.on.consistency=NA
+data1$rank.on.consistency[ordering]=1:nrow(data)
+kable(data1)
+```
+ 
+### Average Runs and Standard deviations of the runs scored by the players:
+
+```{r,echo=FALSE,comment=NA}
+par(mar=c(10,3,2,3))
+data=matrix(c(Average.Runs,sd), nrow=2,byrow=T)
+colnames(data)=Name
+rownames(data)=c("Average Runs","Standard Deviation")
+barplot(data, col=colors()[c(89,23)],las=2,main="Mean and Standard deviations of the runs scored by the respective player",border="white",font.axis=2,beside=T,legend=rownames(data),font.lab=2,ylim=c(0,50))
+```
+
+```{r,echo=FALSE,comment=NA}
+df=read.csv("C:/Users/Pallabi dutta/OneDrive/Documents/cricket.csv")
+paged_table(df)
+```
+
+## Checking Normality:
+
+```{r,echo=FALSE,comment=NA}
+hist(df$Runs,main="Histogram of Runs", xlab="Runs", breaks = 10,col="seagreen")
+```
+
+
+```{r,echo=FALSE,comment=NA}
+qqnorm(df$Runs,pch=20)
+qqline(df$Runs,col="red3",lwd=2)
+```
+
+<div class="warning" style='background-color:#C9D8DD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
+<span>
+<p style='margin-top:1em; text-align:center'>
+<p style='margin-left:1em; text-align:center'>
+The shape of the histogram is not bell shaped and highly skewed and also the Q-Q plot (quantile-quantile plot) line is not straight indicating that the underlying distribution of the variable is not normal distribution which suggests that ANOVA cannot be used to examine the equality of average runs of the batsmen. 
+</p>
+<p style='margin-bottom:1em; margin-right:1em; text-align:right; font-family:Cambria'> <b>- </b> <i> </i>
+</p></span>
+</div>
+
+## Checking heteroscedasticity:
+
+```{r,echo=FALSE,comment=NA}
+par(mar=c(10,5,5,5))
+boxplot(Runs~Name,df,las=2,xlab="",col=terrain.colors(20))
+```
+
+**Conducting Levene's Test:**
+
+```{r,echo=FALSE,comment=NA,warning=FALSE}
+library(car)
+leveneTest(Runs~Name,df)
+```
+
+<div class="warning" style='background-color:#A9D8DD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
+<span>
+<p style='margin-top:1em; text-align:center'>
+<p style='margin-left:1em; text-align:center'>
+The boxplot shows marginal presence of unequal variances among the different batsmen and levene's test has a p-value of 0.2319 (>0.05) resulting in acceptance of null hypothesis. Therefore, it can be concluded that heteroscedasticity is absent.
+</p>
+<p style='margin-bottom:1em; margin-right:1em; text-align:right; font-family:Georgia'> <b>- </b> <i> </i>
+</p></span>
+</div>
+
+# KRUSKAL-WALLIS TEST:
+
+The Kruskal-Wallis test is a non-parametric statistical method used to compare three or more independent groups to determine if there are statistically significant differences in their medians. It serves as an alternative to the one-way ANOVA when the assumptions of normality and homogeneity of variance are not met.
+
+**Hypotheses:**
+
+**Null Hypothesis** ($H_0$): The medians of the groups are equal.
+
+**Alternative Hypothesis** ($H_1$): At least one group median is different from the others.
+
+**Procedure:**
+
+Ranking all data: Combine all observations from the groups and rank them from lowest to highest.
+
+Calculating the test statistic: Using the ranks to compute the Kruskal-Wallis H statistic, which reflects the differences between the average ranks of the groups.
+
+Determining significance: Comparing the H statistic to a chi-square distribution to obtain a p-value. A p-value less than the significance level ($\alpha$) indicates that the null hypothesis can be rejected.
+
+```{r,echo=FALSE,comment=NA}
+kruskal.test(Runs~Name,df)
+```
+
+<div class="warning" style='background-color:#B9C8DD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
+<span>
+<p style='margin-top:1em; text-align:center'>
+<p style='margin-left:1em; text-align:center'>
+Since the p-value is greater than the level of significance 0.05, the null hypothesis cannot be rejected at $5$% level of significance . 
+</p>
+<p style='margin-bottom:1em; margin-right:1em; text-align:right; font-family:Georgia'> <b>- </b> <i> </i>
+</p></span>
+</div>
+
+
+# MODEL FITTING AND CLUSTERING:
+
+The assumed regression function is: $y_t=\alpha+\beta sin(\gamma t)$ for all $t$ is the number of innings played by each player.
+
+Applying **Gauss Newton Theorem** to find the estimates of the parameters of the function $\hat\alpha$, $\hat\beta$ and $\hat\gamma$.
+
+```{r,echo=FALSE,comment=NA}
+f=function(x, param) 
+{
+alpha=param[1]
+beta=param[2]
+gamma=param[3]
+return(alpha+beta*sin(gamma*x))
+}
+D=function(x, param) 
+{
+alpha=param[1]
+beta=param[2]
+gamma=param[3]
+dfdalpha=1
+dfdbeta=sin(gamma*x)
+dfdgamma=beta*x*cos(gamma * x)
+return(cbind(dfdalpha, dfdbeta, dfdgamma))
+}  
+gauss_newton=function(x, y, initial_param, tol = 1e-6, max_iter = 100) 
+{
+param=initial_param
+for (i in 1:max_iter) 
+{
+yi=y-f(x,param)
+Di=D(x,param)
+change=solve(t(Di)%*%Di)%*%t(Di)%*%yi
+param=param+change
+}
+return(param)
+}
+```
+
+**Fitting of the regression line with the estimated parameters:**
+
+```{r,echo=FALSE,comment=NA,warning=FALSE}
+y=df$Runs[df$Name=="Travis Head"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=2,ylab="Runs",ylim=c(0,100),main="Travis Head",xlab="Innings number")
+new_param=gauss_newton(x, y, initial_param=c(2,3.5,8))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,100))
+y1=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Suryakumar Yadav"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=3,ylab="Runs",main="Suryakumar Yadav",ylim=c(0,120),xlab="Innings number")
+new_param=gauss_newton(x, y, initial_param=c(1.5,1,2))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,120))
+y2=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Phil Salt"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=4,ylab="Runs",main="Phil Salt",ylim=c(0,120),xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,2,1.5))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,120))
+y3=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Babar Azam"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=5,ylab="Runs",main="Babar Azam",ylim=c(0,120),xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,0.8,0.85))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,120))
+y4=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Mohammad Rizwan"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=6,ylab="Runs",ylim=c(0,100),main="Mohammad Rizwan",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,1.5,0.85))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,100))
+y5=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Yashasvi Jaiswal"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=7,ylab="Runs",ylim=c(0,110),main="Yashasvi Jaiswal",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,1,1.5))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,110))
+y6=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Jos Butler"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=10,ylab="Runs",ylim=c(0,90),main="Jos Butler",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(2,2,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,90))
+y7=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Ruturaj Gaikwad"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=11,ylab="Runs",ylim=c(0,70),main="Ruturaj Gaikwad",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(2,0.85,1.25))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,70))
+y8=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Brandon King"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=12,ylim=c(0,80),ylab="Runs",main="Brandon King",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(2,1,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,80))
+y9=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Johnson Charles"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=13,ylab="Runs",ylim=c(0,120),main="Johnson Charles",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(2,1,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,120))
+y10=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Aiden Markram"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=14,ylab="Runs",ylim=c(0,70),main="Aiden Markram",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,2,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,70))
+y11=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Nicholas Pooran"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=15,ylab="Runs",ylim=c(0,100),main="Nicholas Pooran",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,2,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,100))
+y12=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Rahmanullah Gurbaz"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=18,ylab="Runs",main="Rahmanullah Gurbaz",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(2,1.5,4))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,100))
+y13=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Quinton De Kock"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=19,ylab="Runs",main="Quinton De Kock",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,2,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,100))
+y14=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Jonny Bairstow"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=20,ylab="Runs",main="Jonny Bairstow",ylim=c(0,90),xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,2,2))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,90))
+y15=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Reeza Hendricks"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=18,ylab="Runs",ylim=c(0,90),main="Reeza Hendricks",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,1,2))
+new_param
+par(new=T)
+y16=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Glenn Phillips"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=21,ylab="Runs",main="Glenn Phillips",ylim=c(0,110),xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1.5,1,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,110))
+y17=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Mitchell Marsh"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=22,ylab="Runs",main="Mitchell Marsh",ylim=c(0,80),xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(0.5,1,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,80))
+y18=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Finn Allen"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=23,ylab="Runs",ylim=c(0,150),main="Finn Allen",xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(0.5,1,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,150))
+y19=round(f(1:50,new_param))
+```
+
+```{r,echo=FALSE,comment=NA}
+y=df$Runs[df$Name=="Rilee Rossouw"]
+x=1:length(y)
+plot(x,y,type='l',lwd=2,col=26,ylab="Runs",main="Rilee Rossouw",ylim=c(0,120),xlab="Innings Number")
+new_param=gauss_newton(x, y, initial_param=c(1,0.8,3))
+new_param
+par(new=T)
+plot(x,round(f(x,new_param)),type='l',xlab="",ylab="",ylim=c(0,120))
+y20=round(f(1:50,new_param))
+```
+```{r,echo=FALSE,comment=NA}
+mat=matrix(c(y1,y2,y3,y4,y5,y6,y7,y8,y9,y10,y11,y12,y13,y14,y15,y16,y17,y18,y19,y20),nrow=20)
+distance_matrix=matrix(0, nrow = 20, ncol = 20) 
+for (i in 1:20) 
+{
+for (j in 1:20) 
+{
+if (i!=j)
+{
+distance_matrix[i, j]=sqrt(sum((mat[i,]-mat[j,])^2))
+}
+}
+}
+distance_matrix
+```
+```{r,echo=FALSE,comment=NA}
+plot(hclust(as.dist(distance_matrix), method = "average"))
+```
+
+# CONCLUSION
+
+<div class="warning" style='background-color:#E9D8DD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
+<span>
+<p style='margin-top:1em; text-align:center'>
+<p style='margin-left:1em; text-align:center'>
+
+Based on the analysis, *Travis Head (Australia)* exhibits the lowest standard deviation ($\sigma = 22.82774$) among the top 20 ICC T20 cricketers in 16, July 2024. This indicates superior consistency compared to his peers. Given his lower variability in scores and an average of 32.53 runs, Head is likely to achieve scores closer to his average more frequently.
+
+*Johnson Charles (West Indies)* and *Nicholas Pooran (West Indies)* follow *Travis Head* as the next most consistent players, based on their respective standard deviations and averages. Indian batsmen *Suryakumar Yadav*, *Yashasvi Jaiswal* and *Ruturaj Gaikwad* occupy the eighteenth, sixteenth and nineteenth positions, respectively, in terms of consistency among the top 20 ICC T20 cricketers in July, 2024. 
+
+**Batsmen performances are homogeneous.**
+
+The dendrogram you have provided is a hierarchical clustering of the top 20 ICC T20I batsmen, where each number represents a specific batsman. 
+
+• Height: The vertical axis represents the "distance" or "similarity" between clusters. The higher the link on the dendrogram, the more dissimilar the clusters.
+
+• Players are grouped based on their similarity in performance related to their ranking.
+
+• Players in close proximity to each other (such as **7** and **16** or **11** and **20**) have similar performance metrics or playing styles. These groups could potentially represent players with similar strengths, weaknesses, or roles (e.g., similar strike rates or run-scoring patterns).
+
+• The batsmen can be divided into two broad groups, where each group might represent a different style or consistency level. For instance, the first group might include batsmen who are more aggressive or consistent, while the second group might contain batsmen with different strengths.
+The first major group includes players **7**, **16**, **3**, **12**, **18**, **5**, **9**, **1** and **13**.
+The second major group includes players **11**, **20**, **8**, **17**, **14**, **4**, **19**, **15**, **10**, **2** and **6**.
+
+• Players **2** and **6** are less similar to most others, indicating they may have a unique skill set or performance trend.
+
+</p>
+<p style='margin-bottom:1em; margin-right:1em; text-align:right; font-family:Georgia'> <b>- </b> <i> </i>
+</p></span>
+</div>
+
+
